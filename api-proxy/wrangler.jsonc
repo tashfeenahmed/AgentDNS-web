@@ -2,8 +2,11 @@
   "name": "agentdns-api",
   "main": "worker.js",
   "compatibility_date": "2024-11-01",
-  // Bind api.makes.fyi to this Worker (auto-manages DNS + edge cert).
+  // api.agentdomains.co is the primary API host; api.makes.fyi stays bound as a
+  // fallback so existing CLIs/configs keep working through the transition. Both
+  // forward to the same origin (the Oracle box) regardless of incoming host.
   "routes": [
+    { "pattern": "api.agentdomains.co", "custom_domain": true },
     { "pattern": "api.makes.fyi", "custom_domain": true }
   ]
 }

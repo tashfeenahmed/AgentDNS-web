@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AgentDNS: a domain for the sites your agents build</title>
-<meta name="description" content="When an AI agent builds a website, it needs a domain to put it on. AgentDNS gives it one (yourname.makes.fyi) from a single command. Free.">
-<meta property="og:title" content="AgentDNS: yourname.makes.fyi">
+<title>AgentDomains: a domain for the sites your agents build</title>
+<meta name="description" content="When an AI agent builds a website, it needs a domain to put it on. AgentDomains gives it one (yourname.makes.fyi) from a single command. Free.">
+<meta property="og:title" content="AgentDomains: yourname.makes.fyi">
 <meta property="og:description" content="A free domain for the websites your AI agents build, in one command.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -71,10 +71,10 @@
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">agent<span class="dot">·</span>dns</div>
+    <div class="brand">agent<span class="dot">·</span>domains</div>
     <nav>
-      <a href="https://docs.makes.fyi">docs</a>
-      <a href="https://github.com/tashfeenahmed/AgentDNS">github</a>
+      <a href="https://docs.agentdomains.co">docs</a>
+      <a href="https://github.com/tashfeenahmed/AgentDomains">github</a>
     </nav>
   </header>
 
@@ -86,17 +86,18 @@
       <span class="you">yourname</span><span>.makes.fyi</span>
     </div>
     <p class="sub">When an agent ships a website or an API, it needs somewhere to put it.
-       One command gets a working domain that the agent can wire up by itself.</p>
+       One command gets a working domain, under <strong>makes.fyi</strong> or
+       <strong>agentdomains.co</strong>, that the agent can wire up by itself.</p>
 
     <div class="cta">
-      <a class="btn primary" href="https://docs.makes.fyi">Get started →</a>
-      <a class="btn ghost" href="https://github.com/tashfeenahmed/AgentDNS">★ GitHub</a>
+      <a class="btn primary" href="https://docs.agentdomains.co">Get started →</a>
+      <a class="btn ghost" href="https://github.com/tashfeenahmed/AgentDomains">★ GitHub</a>
     </div>
   </section>
 
   <section class="cards">
-    <div class="step"><span class="n">1</span><h3>Sign up</h3><code>$ agentdns signup</code></div>
-    <div class="step"><span class="n">2</span><h3>Claim a domain</h3><code>$ agentdns claim yourname</code></div>
+    <div class="step"><span class="n">1</span><h3>Sign up</h3><code>$ agentdomains signup</code></div>
+    <div class="step"><span class="n">2</span><h3>Claim a domain</h3><code>$ agentdomains claim yourname</code></div>
     <div class="step"><span class="n">3</span><h3>Point it anywhere</h3><code>→ yourname.makes.fyi ✨</code></div>
   </section>
 
@@ -109,15 +110,15 @@
 
   <div class="install">
     <span class="c"># install</span><br>
-    <span class="p">$</span> go install github.com/tashfeenahmed/AgentDNS/cmd/agentdns@latest<br><br>
+    <span class="p">$</span> go install github.com/tashfeenahmed/AgentDomains/cmd/agentdomains@latest<br><br>
     <span class="c"># point a domain at the site your agent just built</span><br>
-    <span class="p">$</span> agentdns claim mybot --type A --content 203.0.113.10<br>
+    <span class="p">$</span> agentdomains claim mybot --type A --content 203.0.113.10<br>
     <span class="g">✓ mybot.makes.fyi is live</span>
   </div>
 
   <footer>
-    <span>agent·dns, a project on <a href="https://makes.fyi">makes.fyi</a></span>
-    <span><a href="https://docs.makes.fyi">docs</a> · <a href="https://github.com/tashfeenahmed/AgentDNS">github</a> · FSL-1.1</span>
+    <span>agent·domains, free domains for the sites agents build</span>
+    <span><a href="https://docs.agentdomains.co">docs</a> · <a href="https://github.com/tashfeenahmed/AgentDomains">github</a> · FSL-1.1</span>
   </footer>
 </div>
 </body>

@@ -1,4 +1,4 @@
-// Reverse-proxy Worker for api.makes.fyi -> AgentDNS origin (Oracle VM).
+// Reverse-proxy Worker for api.makes.fyi -> AgentDomains origin (Oracle VM).
 //
 // Why a Worker instead of a proxied DNS record? The zone's SSL/TLS mode is
 // "Full", so Cloudflare's normal proxy would try to reach the origin on :443,

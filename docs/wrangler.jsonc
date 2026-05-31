@@ -5,6 +5,7 @@
     "directory": "./public"
   },
   "routes": [
+    { "pattern": "docs.agentdomains.co", "custom_domain": true },
     { "pattern": "docs.makes.fyi", "custom_domain": true }
   ]
 }
