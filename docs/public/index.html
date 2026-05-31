@@ -66,6 +66,7 @@
     <a href="#accounts">Accounts &amp; validation</a>
     <a href="#records">DNS records</a>
     <a href="#ssl">Getting HTTPS / SSL</a>
+    <a href="#forwarding">URL forwarding</a>
     <a href="#delegation">Nameserver delegation</a>
     <a href="#agents">Using it from agents</a>
     <div class="grp">Reference</div>
@@ -141,6 +142,24 @@ sudo certbot certonly --standalone -d mybot.makes.fyi</code></pre>
     <p>Add the ACME challenge token as a TXT record:</p>
     <pre><code>agentdomains txt mybot "&lt;token-from-acme-client&gt;" --host _acme-challenge</code></pre>
 
+    <h2 id="forwarding">URL forwarding</h2>
+    <p>Forward a name to any URL with a real HTTP redirect, served at the edge with
+    valid HTTPS. <code>forward</code> claims the label first if you don't own it yet,
+    so it's a single step:</p>
+    <pre><code>agentdomains forward me https://my-portfolio.example.com
+# me.makes.fyi -> 302 redirect to https://my-portfolio.example.com
+
+agentdomains forward me https://dest.com --permanent        # 301 instead of 302
+agentdomains forward me https://dest.com --no-preserve-path # land on target root
+agentdomains unforward me                                   # remove the forward</code></pre>
+    <p>The request path and query are preserved by default
+    (<code>me.makes.fyi/blog?x=1</code> → <code>…/blog?x=1</code>). A forward replaces
+    address records: a label can't hold both a forward and an A/AAAA/CNAME at once
+    (TXT records still coexist).</p>
+    <div class="note">Forwarding is an HTTP redirect, not hosting — the visitor's
+    browser ends up on the target URL. To serve your own content on the name instead,
+    point an <code>A</code>/<code>CNAME</code> record at your server.</div>
+
     <h2 id="delegation">Nameserver delegation</h2>
     <p>Want full control of the subtree, with your own records, MX, and sub-domains?
     Delegate it to your nameservers:</p>
@@ -165,6 +184,8 @@ agentdomains claim $NAME --type A --content $IP --json | jq -r .fqdn</code></pre
       <tr><td><code>agentdomains list</code></td><td>List your domains</td></tr>
       <tr><td><code>agentdomains get &lt;label&gt;</code></td><td>Show one domain and its records</td></tr>
       <tr><td><code>agentdomains record &lt;label&gt;</code></td><td>Add a record: <code>--type --content [--host]</code></td></tr>
+      <tr><td><code>agentdomains forward &lt;label&gt; &lt;url&gt;</code></td><td>Forward to a URL (<code>--permanent</code>, <code>--no-preserve-path</code>); claims the label if needed</td></tr>
+      <tr><td><code>agentdomains unforward &lt;label&gt;</code></td><td>Remove a forward</td></tr>
       <tr><td><code>agentdomains ns &lt;label&gt; &lt;ns&gt;…</code></td><td>Delegate to your nameservers</td></tr>
       <tr><td><code>agentdomains txt &lt;label&gt; &lt;value&gt;</code></td><td>Add a TXT record (<code>--host _acme-challenge</code>)</td></tr>
       <tr><td><code>agentdomains delete &lt;label&gt;</code></td><td>Delete a domain and its records</td></tr>
@@ -186,6 +207,8 @@ agentdomains claim $NAME --type A --content $IP --json | jq -r .fqdn</code></pre
       <tr><td><code>GET /v1/subdomains/{label}</code></td><td>Show one</td></tr>
       <tr><td><code>POST /v1/subdomains/{label}/records</code></td><td>Add a record</td></tr>
       <tr><td><code>PUT /v1/subdomains/{label}/ns</code></td><td><code>{"nameservers":[…]}</code></td></tr>
+      <tr><td><code>PUT /v1/subdomains/{label}/forward</code></td><td><code>{"target","permanent?","preserve_path?","cloak?"}</code></td></tr>
+      <tr><td><code>DELETE /v1/subdomains/{label}/forward</code></td><td>Remove a forward</td></tr>
       <tr><td><code>DELETE /v1/subdomains/{label}</code></td><td>Delete</td></tr>
     </table>
     <pre><code># example: claim with curl
