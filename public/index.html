@@ -10,7 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Rubik+Mono+One&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Gaegu:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --energy:#00CC74;   /* myenergi-style vivid green */
@@ -25,11 +25,14 @@
   body{
     margin:0;background:var(--canvas);color:var(--ink);
     font-family:'Gaegu',cursive;font-size:1.2rem;line-height:1.25;overflow-x:hidden;
-    cursor:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="8" fill="none" stroke="%2300CC74" stroke-width="2.5"/></svg>') 11 11, auto;
+    cursor:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="8" fill="none" stroke="%2300CC74" stroke-width="2.5"/></svg>') 11 11, crosshair;
   }
   a{color:inherit}
-  h1,h2,h3{font-family:'Rubik Mono One',sans-serif;text-transform:uppercase;margin:0;line-height:.9}
+  h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;margin:0;line-height:.92;letter-spacing:-1px}
   input{cursor:text}
+
+  /* full-screen doodle layer — never blocks clicks (pointer-events:none) */
+  #doodle{position:fixed;inset:0;z-index:60;pointer-events:none}
 
   .checkerboard-bg{
     background-image:
@@ -41,74 +44,91 @@
     opacity:.06;position:fixed;inset:0;z-index:-1;pointer-events:none;
   }
 
-  nav{display:flex;justify-content:space-between;padding:1.6rem 2rem;align-items:center;flex-wrap:wrap;gap:1rem}
-  .logo{font-size:1.9rem;font-weight:700;text-decoration:underline;text-decoration-style:wavy;text-decoration-color:var(--energy);text-underline-offset:6px}
-  .nav-links{display:flex;gap:1.6rem;align-items:center}
+  nav{display:flex;justify-content:space-between;padding:1.3rem 2rem;align-items:center;flex-wrap:wrap;gap:1rem}
+  .logo{font-size:1.8rem;font-weight:700;text-decoration:underline;text-decoration-style:wavy;text-decoration-color:var(--energy);text-underline-offset:6px}
+  .nav-links{display:flex;gap:1.5rem;align-items:center}
   .nav-links a{text-decoration:none;border-bottom:2px solid transparent;transition:.2s}
   .nav-links a:hover{border-bottom:2px solid var(--energy);transform:rotate(-2deg)}
   .nav-cta{background:var(--ink);color:#fff;padding:.4rem 1rem;border-radius:6px;border:2px solid var(--ink)}
   .nav-cta:hover{background:var(--energy);color:var(--ink);border-bottom:2px solid var(--ink)!important}
 
-  .hero{padding:3rem 2rem;display:grid;grid-template-columns:1.1fr .9fr;min-height:72vh;align-items:center;gap:2rem}
-  .hero-title{font-size:clamp(3rem,9vw,7rem);margin-bottom:1.2rem;letter-spacing:-2px}
+  .hero{padding:1.5rem 2rem 2.5rem;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:2rem}
+  .hero-title{font-size:clamp(2.1rem,6vw,4.4rem);font-weight:800;text-transform:uppercase;margin-bottom:1rem}
   .hero-title .g{color:var(--energy)}
-  .hero-subtitle{font-size:1.5rem;max-width:520px;padding:1rem 1.3rem;border:3px solid var(--ink);
+  .hero-subtitle{font-size:1.35rem;max-width:520px;padding:.9rem 1.2rem;border:3px solid var(--ink);
     border-radius:40% 10% 40% 10% / 10% 40% 10% 40%;background:var(--mint);display:inline-block;transform:rotate(-1.5deg)}
   .hero-subtitle b{color:var(--energy-d)}
 
-  .domain-search{margin-top:2.4rem}
+  .domain-search{margin-top:1.8rem}
   .metadata{font-family:'Space Mono',monospace;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;opacity:.6}
-  .input-wrapper{display:flex;align-items:center;background:#fff;border:4px solid var(--ink);padding:.7rem .9rem;
-    border-radius:12px;box-shadow:8px 8px 0 var(--energy);max-width:680px;transition:transform .15s}
-  .input-wrapper input{border:none;outline:none;font-family:'Space Mono',monospace;font-size:clamp(1.3rem,4vw,2.1rem);width:100%;color:var(--ink);background:transparent}
-  .suffix{font-family:'Space Mono',monospace;font-size:clamp(1rem,3vw,1.5rem);background:var(--ink);color:#fff;
-    padding:.45rem .8rem;border-radius:6px;margin-left:.8rem;white-space:nowrap;border:2px solid var(--ink)}
+  .input-wrapper{display:flex;align-items:center;background:#fff;border:4px solid var(--ink);padding:.6rem .8rem;
+    border-radius:12px;box-shadow:8px 8px 0 var(--energy);max-width:640px;transition:transform .15s}
+  .input-wrapper input{border:none;outline:none;font-family:'Space Mono',monospace;font-size:clamp(1.2rem,3.6vw,1.9rem);width:100%;color:var(--ink);background:transparent}
+  .suffix{font-family:'Space Mono',monospace;font-size:clamp(1rem,2.6vw,1.4rem);background:var(--ink);color:#fff;
+    padding:.4rem .75rem;border-radius:6px;margin-left:.7rem;white-space:nowrap;border:2px solid var(--ink)}
   .suffix:hover{background:var(--energy);color:var(--ink)}
-  .search-note{font-size:1.05rem;margin-top:.7rem;opacity:.75}
-
-  .btn{display:inline-block;padding:.9rem 1.8rem;background:var(--energy);color:var(--ink);text-decoration:none;
-    font-family:'Rubik Mono One',sans-serif;font-size:1rem;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);
-    border-radius:8px;transition:.12s;margin-top:1.6rem}
+  .search-note{font-size:1.02rem;margin-top:.6rem;opacity:.75}
+  .btn{display:inline-block;padding:.85rem 1.7rem;background:var(--energy);color:var(--ink);text-decoration:none;
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1rem;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);
+    border-radius:8px;transition:.12s;margin-top:1.3rem}
   .btn:active{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--ink)}
   .btn.ghost{background:#fff}
   .btn-row{display:flex;gap:1rem;flex-wrap:wrap}
 
-  .dragon-container{display:flex;justify-content:center;align-items:center}
-  .dragon-svg{width:115%;height:auto;transform:rotate(-5deg);filter:drop-shadow(10px 10px 0 rgba(0,204,116,.22))}
-  .scribble-path{fill:none;stroke:var(--energy);stroke-width:42;stroke-linecap:round;stroke-linejoin:round;
-    stroke-dasharray:2000;stroke-dashoffset:2000;animation:draw 3s ease-out forwards}
-  @keyframes draw{to{stroke-dashoffset:0}}
+  /* right-side scribbled example domains */
+  .examples{position:relative;min-height:320px;display:flex;flex-direction:column;justify-content:center;gap:1.6rem;padding:1rem}
+  .tag{font-family:'Space Mono',monospace;font-size:clamp(1rem,2.4vw,1.4rem);font-weight:700;background:#fff;
+    border:3px solid var(--ink);border-radius:14px 6px 18px 8px;padding:.7rem 1rem;display:inline-flex;align-items:center;
+    gap:.7rem;width:fit-content;transition:.2s}
+  .tag .live{font-family:'Gaegu',cursive;font-size:.95rem;background:var(--energy);color:var(--ink);border:2px solid var(--ink);border-radius:20px;padding:0 .55rem}
+  .tag-1{transform:rotate(-3deg);box-shadow:7px 7px 0 var(--energy);margin-left:1rem}
+  .tag-2{transform:rotate(2deg);box-shadow:7px 7px 0 var(--lime);align-self:flex-end;margin-right:1.5rem}
+  .tag-3{transform:rotate(-1.5deg);box-shadow:7px 7px 0 var(--ink);margin-left:2.5rem}
+  .tag:hover{transform:rotate(0) scale(1.04)}
+  .doodle{position:absolute;pointer-events:none}
+  .d-arrow{top:30px;right:18%;width:120px}
+  .d-star{top:6px;left:6%;width:46px}
+  .d-squiggle{bottom:6px;left:14%;width:170px}
 
   /* terminal band */
-  .term{margin:1rem 2rem 0;background:var(--ink);color:#ECECEC;border:3px solid var(--ink);border-radius:14px;
-    box-shadow:10px 10px 0 var(--lime);padding:1.4rem 1.6rem;font-family:'Space Mono',monospace;font-size:1rem;overflow-x:auto;line-height:1.9}
+  .term{margin:.5rem 2rem 0;background:var(--ink);color:#ECECEC;border:3px solid var(--ink);border-radius:14px;
+    box-shadow:10px 10px 0 var(--lime);padding:1.3rem 1.5rem;font-family:'Space Mono',monospace;font-size:1rem;overflow-x:auto;line-height:1.9}
   .term .c{color:#8a8a8a}.term .g{color:var(--energy)}.term .p{color:var(--lime)}
 
-  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;padding:4rem 2rem 2rem}
+  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;padding:3.5rem 2rem 2rem}
   .feature-card{border:3px solid var(--ink);padding:1.8rem;background:#fff;transition:.25s;position:relative}
   .feature-card:nth-child(1){border-radius:50px 10px 40px 20px;transform:rotate(-1deg)}
   .feature-card:nth-child(2){border-radius:15px 55px 20px 45px;transform:rotate(1deg);background:var(--ink);color:#fff}
   .feature-card:nth-child(3){border-radius:30px 20px 50px 15px;transform:rotate(-.5deg)}
   .feature-card:nth-child(4){border-radius:20px 45px 15px 50px;transform:rotate(.8deg)}
   .feature-card:hover{transform:scale(1.02) rotate(0);box-shadow:12px 12px 0 var(--energy)}
-  .feature-card h3{font-size:1.4rem;margin-bottom:.7rem;color:var(--energy-d)}
+  .feature-card h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;text-transform:uppercase;font-size:1.35rem;margin-bottom:.7rem;color:var(--energy-d)}
   .feature-card:nth-child(2) h3{color:var(--lime)}
   .feature-card code{font-family:'Space Mono',monospace;font-size:.85rem;background:var(--mint);border:1.5px solid var(--ink);border-radius:6px;padding:1px 6px}
   .feature-card:nth-child(2) code{background:#1c1c1c;color:var(--lime);border-color:#333}
 
-  footer{padding:4rem 2rem;border-top:4px solid var(--ink);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:2rem;margin-top:2rem}
-  footer h2{font-size:clamp(2rem,6vw,3.2rem)}
+  footer{padding:3.5rem 2rem;border-top:4px solid var(--ink);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:2rem;margin-top:2rem}
+  footer h2{font-size:clamp(1.9rem,5.5vw,3rem);font-weight:800;text-transform:uppercase}
   footer h2 .g{color:var(--energy)}
   .foot-mono{font-family:'Space Mono',monospace;margin-top:1rem;font-size:.9rem}
   .foot-links{display:flex;gap:1.2rem;margin-top:1rem}
   .foot-links a{border-bottom:2px solid var(--energy);text-decoration:none}
 
-  @media(max-width:1024px){.hero{grid-template-columns:1fr}.dragon-container{display:none}}
+  /* doodle controls */
+  .doodle-ctl{position:fixed;bottom:14px;right:14px;z-index:70;display:flex;gap:.5rem;align-items:center;
+    font-family:'Space Mono',monospace;font-size:.8rem}
+  .doodle-ctl .hint{background:#fff;border:2px solid var(--ink);border-radius:20px;padding:.25rem .7rem;opacity:.85}
+  .doodle-ctl button{font-family:'Space Mono',monospace;font-size:.8rem;background:var(--lime);border:2px solid var(--ink);
+    border-radius:20px;padding:.25rem .8rem;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+  .doodle-ctl button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+
+  @media(max-width:1024px){.hero{grid-template-columns:1fr}.examples{order:2;min-height:260px}}
 </style>
 </head>
 <body>
 
 <div class="checkerboard-bg"></div>
+<canvas id="doodle"></canvas>
 
 <nav>
   <div class="logo">agent·domains</div>
@@ -123,7 +143,7 @@
 <main>
   <section class="hero">
     <div class="hero-text">
-      <h1 class="hero-title">FREE<br>DOMAINS<br><span class="g">FOR AGENTS.</span></h1>
+      <h1 class="hero-title">Free domains<br><span class="g">for agents.</span></h1>
       <p class="hero-subtitle">Your AI agent just built a site. Give it a real domain — <b>makes.fyi</b> or <b>agentdomains.co</b> — in one command.</p>
 
       <div class="domain-search">
@@ -140,25 +160,22 @@
       </div>
     </div>
 
-    <div class="dragon-container">
-      <svg viewBox="0 0 500 500" class="dragon-svg" aria-hidden="true">
-        <path class="scribble-path" d="M 50,400 C 50,100 150,50 250,250 C 350,450 450,150 450,50"></path>
-        <g stroke="var(--ink)" stroke-width="3" fill="none">
-          <path d="M 430,30 Q 450,10 470,30 L 480,60 Q 450,80 430,60 Z" fill="var(--energy)"></path>
-          <circle cx="455" cy="40" r="3" fill="var(--ink)"></circle>
-          <circle cx="465" cy="45" r="3" fill="var(--ink)"></circle>
-          <path d="M 450,20 L 440,0" stroke="var(--lime)" stroke-width="6"></path>
-          <path d="M 465,25 L 475,5" stroke="var(--lime)" stroke-width="6"></path>
-          <path d="M 100,300 Q 110,290 120,300"></path>
-          <path d="M 150,250 Q 160,240 170,250"></path>
-          <path d="M 300,350 Q 310,340 320,350"></path>
-        </g>
-        <g transform="translate(180,150) rotate(-10)">
-          <path d="M 0,0 Q 20,-100 40,0 L 40,120 Q 20,130 0,120 Z" fill="#fff" stroke="var(--ink)" stroke-width="3"></path>
-          <circle cx="15" cy="30" r="2" fill="var(--ink)"></circle>
-          <circle cx="25" cy="30" r="2" fill="var(--ink)"></circle>
-          <path d="M 10,40 Q 20,45 30,40" stroke="var(--ink)" fill="none"></path>
-        </g>
+    <div class="examples" aria-label="example domains">
+      <div class="metadata">// claimed today</div>
+      <div class="tag tag-1">siteforhuman.makes.fyi <span class="live">✓ live</span></div>
+      <div class="tag tag-2">samtheagent.makes.fyi <span class="live">✓ live</span></div>
+      <div class="tag tag-3">myshop.agentdomains.co <span class="live">✓ live</span></div>
+
+      <!-- hand-drawn doodle accents -->
+      <svg class="doodle d-star" viewBox="0 0 40 40" fill="none" stroke="var(--lime)" stroke-width="3" stroke-linecap="round">
+        <path d="M20 4 L24 16 L37 16 L26 24 L30 36 L20 28 L10 36 L14 24 L3 16 L16 16 Z"/>
+      </svg>
+      <svg class="doodle d-arrow" viewBox="0 0 120 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 40 C 30 50, 70 50, 110 14"/>
+        <path d="M110 14 L96 18 M110 14 L104 30"/>
+      </svg>
+      <svg class="doodle d-squiggle" viewBox="0 0 170 24" fill="none" stroke="var(--energy)" stroke-width="4" stroke-linecap="round">
+        <path d="M4 12 Q 20 -2 36 12 T 68 12 T 100 12 T 132 12 T 164 12"/>
       </svg>
     </div>
   </section>
@@ -199,7 +216,7 @@
 
   <footer>
     <div>
-      <h2>FREE DOMAINS<br>FOR THE SITES<br><span class="g">AGENTS BUILD.</span></h2>
+      <h2>Free domains<br>for the sites<br><span class="g">agents build.</span></h2>
       <p class="foot-mono">© 2026 AGENTDOMAINS.CO // MAKES.FYI · FSL-1.1</p>
     </div>
     <div style="text-align:right">
@@ -212,6 +229,11 @@
     </div>
   </footer>
 </main>
+
+<div class="doodle-ctl">
+  <span class="hint">✏️ drag anywhere to doodle</span>
+  <button id="clear-doodle" type="button">clear</button>
+</div>
 
 <script>
   // playful wobble on the search box as you type
@@ -226,18 +248,33 @@
   const suffix = document.getElementById('suffix');
   const domains = ['.makes.fyi', '.agentdomains.co'];
   let di = 0;
-  suffix.addEventListener('click', () => {
-    di = (di + 1) % domains.length;
-    suffix.textContent = domains[di];
-  });
+  suffix.addEventListener('click', () => { di = (di + 1) % domains.length; suffix.textContent = domains[di]; });
 
-  // subtle parallax on the scribble creature
-  const dragon = document.querySelector('.dragon-svg');
-  if (dragon) document.addEventListener('mousemove', e => {
-    const x = (window.innerWidth / 2 - e.pageX) / 55;
-    const y = (window.innerHeight / 2 - e.pageY) / 55;
-    dragon.style.transform = `rotate(-5deg) translate(${x}px, ${y}px)`;
+  // draw-anywhere doodle layer. Canvas is pointer-events:none, so the UI stays
+  // clickable; we listen on window and draw while the mouse button is held.
+  const cv = document.getElementById('doodle');
+  const ctx = cv.getContext('2d');
+  function sizeCanvas(){
+    const r = window.devicePixelRatio || 1;
+    cv.width = innerWidth * r; cv.height = innerHeight * r;
+    ctx.setTransform(r, 0, 0, r, 0, 0);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 4;
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--energy').trim() || '#00CC74';
+  }
+  sizeCanvas();
+  let resizeTimer; addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(sizeCanvas, 150); });
+
+  let drawing = false, last = null;
+  const point = e => ({ x: e.clientX, y: e.clientY });
+  addEventListener('mousedown', e => { drawing = true; last = point(e); });
+  addEventListener('mousemove', e => {
+    if (!drawing) return;
+    const p = point(e);
+    ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+    last = p;
   });
+  addEventListener('mouseup', () => { drawing = false; });
+  document.getElementById('clear-doodle').addEventListener('click', () => ctx.clearRect(0, 0, cv.width, cv.height));
 </script>
 </body>
 </html>
