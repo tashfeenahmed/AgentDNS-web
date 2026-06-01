@@ -99,10 +99,12 @@ agentdomains --help</code></pre>
 
     <h2 id="quickstart">Quickstart</h2>
     <pre><code>agentdomains signup                                   # instant account + API key
-agentdomains claim myagent --type A --content 203.0.113.10
+agentdomains claim myagent --email you@example.com --type A --content 203.0.113.10
 dig +short myagent.makes.fyi                       # 203.0.113.10 ✨</code></pre>
-    <div class="note">No email is required to start. Your account stays <strong>provisional</strong>
-    for 30 days. Validate it (below) to keep it and raise your quota.</div>
+    <div class="note">Your <strong>first</strong> registration needs <code>--email</code> — we send a
+    confirmation link and start a 30-day clock. Confirm within 30 days or the name (and any others
+    on the account) is deleted automatically. After the first time, the email is remembered on the
+    account, so later <code>claim</code>/<code>forward</code>/<code>proxy</code> calls don't repeat it.</div>
 
     <h3>Choosing a domain</h3>
     <p>Names are claimed under <code>makes.fyi</code> by default. Pass
@@ -112,14 +114,16 @@ dig +short myagent.makes.fyi                       # 203.0.113.10 ✨</code></pr
     <code>--domain</code> when a label is claimed under both.</p>
     <pre><code>agentdomains claim myagent --domain agentdomains.co   # myagent.agentdomains.co</code></pre>
 
-    <h2 id="accounts">Accounts &amp; validation</h2>
-    <p>Signup creates a <span class="pill">provisional</span> account with a quota of
-    <strong>1</strong> domain and a 30-day clock. To make it permanent and raise the
-    quota to <strong>3</strong>, a human attaches and confirms an email:</p>
-    <pre><code>agentdomains email you@example.com   # we send a link; a human clicks it
-agentdomains whoami                  # state: verified once confirmed</code></pre>
-    <p>If an account is never validated within 30 days, it and its domains are
-    automatically removed and the names are released.</p>
+    <h2 id="accounts">Accounts &amp; confirmation</h2>
+    <p>Signup creates an anonymous <span class="pill">provisional</span> account and API key.
+    The first time you register a name you pass <code>--email</code>; we email a confirmation
+    link and the account stays provisional on a <strong>30-day clock</strong>. Confirming the
+    link (a human clicks it) makes the account — and all its names — permanent:</p>
+    <pre><code>agentdomains claim myagent --email you@example.com   # registers + emails a link
+agentdomains whoami                                  # state: verified once confirmed</code></pre>
+    <p>You can also (re)send the link any time with <code>agentdomains email you@example.com</code>.
+    If the account is never confirmed within 30 days, it and all its names are removed automatically
+    by a background job and the names are released. (There's no per-account name limit right now.)</p>
 
     <h2 id="records">DNS records</h2>
     <p>Claim a label, optionally with a record, then add more any time:</p>
@@ -202,7 +206,7 @@ agentdomains claim $NAME --type A --content $IP --json | jq -r .fqdn</code></pre
       <tr><td><code>agentdomains signup</code></td><td>Create an account; saves the key to <code>~/.agentdomains/config.json</code></td></tr>
       <tr><td><code>agentdomains whoami</code></td><td>Account state, quota, usage</td></tr>
       <tr><td><code>agentdomains email &lt;addr&gt;</code></td><td>Attach an email for human validation</td></tr>
-      <tr><td><code>agentdomains claim &lt;label&gt;</code></td><td>Claim <code>&lt;label&gt;.makes.fyi</code> (or <code>--domain agentdomains.co</code>; + optional <code>--type/--content/--host</code>)</td></tr>
+      <tr><td><code>agentdomains claim &lt;label&gt;</code></td><td>Register <code>&lt;label&gt;.makes.fyi</code> (<code>--email</code> required on first use; <code>--domain agentdomains.co</code>; optional <code>--type/--content/--host</code>)</td></tr>
       <tr><td><code>agentdomains list</code></td><td>List your domains</td></tr>
       <tr><td><code>agentdomains get &lt;label&gt;</code></td><td>Show one domain and its records</td></tr>
       <tr><td><code>agentdomains record &lt;label&gt;</code></td><td>Add a record: <code>--type --content [--host]</code></td></tr>
@@ -226,7 +230,7 @@ agentdomains claim $NAME --type A --content $IP --json | jq -r .fqdn</code></pre
       <tr><td><code>POST /v1/signup</code></td><td>Create a provisional account, returns <code>api_key</code></td></tr>
       <tr><td><code>GET /v1/whoami</code></td><td>Account info</td></tr>
       <tr><td><code>POST /v1/account/email</code></td><td><code>{"email":"…"}</code>, sends a validation link</td></tr>
-      <tr><td><code>POST /v1/subdomains</code></td><td><code>{"label","domain?","type?","content?","host?"}</code></td></tr>
+      <tr><td><code>POST /v1/subdomains</code></td><td><code>{"label","email?","domain?","type?","content?","host?"}</code> — <code>email</code> required on first registration</td></tr>
       <tr><td><code>GET /v1/subdomains</code></td><td>List</td></tr>
       <tr><td><code>GET /v1/subdomains/{label}</code></td><td>Show one</td></tr>
       <tr><td><code>POST /v1/subdomains/{label}/records</code></td><td>Add a record</td></tr>
@@ -241,7 +245,7 @@ agentdomains claim $NAME --type A --content $IP --json | jq -r .fqdn</code></pre
 KEY=$(curl -s -X POST https://api.agentdomains.co/v1/signup | jq -r .api_key)
 curl -s -X POST https://api.agentdomains.co/v1/subdomains \
   -H "Authorization: Bearer $KEY" \
-  -d '{"label":"myagent","type":"A","content":"203.0.113.10"}'</code></pre>
+  -d '{"label":"myagent","email":"you@example.com","type":"A","content":"203.0.113.10"}'</code></pre>
 
     <p class="muted" style="margin-top:3em">agent·domains · <a href="https://agentdomains.co">agentdomains.co</a> · <a href="https://github.com/tashfeenahmed/AgentDomains">GitHub</a></p>
   </main>
